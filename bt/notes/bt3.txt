@@ -1,0 +1,203 @@
+Your Code (with line numbers)
+1  // SPDX-License-Identifier: Bhide License
+2  pragma solidity ^0.8.0;
+3
+4  contract Bank {
+5      // mapping(type => type)
+6      mapping(address => uint256) private balances;
+7
+8      function createAccount() public {
+9          balances[msg.sender] = 0;
+10     }
+11
+12     // payable is necessary because the function accepts a value (amount) as a parameter (EXTERNAL SOURCE AHE MHANUN)
+13     function deposit(uint256 amount) public payable {
+14         balances[msg.sender] += amount;
+15     }
+16
+17     function withdraw(uint256 amount) public {
+18         require(balances[msg.sender] >= amount, "Insufficient balance");
+19         balances[msg.sender] -= amount;
+20     }
+21
+22     function transfer(address recipient, uint256 amount) public {
+23         require(balances[msg.sender] >= amount, "Insufficient balance");
+24         balances[msg.sender] -= amount;
+25         balances[recipient] += amount;
+26     }
+27
+28     // view does not modify values within the contract (return kartana lihaycha)
+29     function getBalance() public view returns (uint256) {
+30         return balances[msg.sender];
+31     }
+32 }
+
+Line-by-line explanation
+
+1 // SPDX-License-Identifier: Bhide License
+
+// starts a single-line comment.
+
+SPDX-License-Identifier is a standard header for license tooling.
+
+"Bhide License" is just a string you wrote; typical values are MIT, GPL-3.0, etc.
+
+2 pragma solidity ^0.8.0;
+
+Compiler directive: compile with Solidity version 0.8.0 or newer (but <0.9.0).
+
+Solidity 0.8+ has built-in overflow/underflow checks.
+
+3 (blank)
+
+Just spacing for readability.
+
+4 contract Bank {
+
+Begins a new smart contract named Bank.
+
+Everything between { ... } is the contract’s code and state.
+
+5 // mapping(type => type)
+
+Comment reminding mapping syntax.
+
+6 mapping(address => uint256) private balances;
+
+Declares a state variable named balances.
+
+Type: a mapping from address → uint256.
+
+Key: an Ethereum address (EOA or contract).
+
+Value: an unsigned 256-bit integer.
+
+private: only functions inside this contract can access balances directly.
+
+Default for any balances[someAddress] is 0 until written.
+
+7 (blank)
+
+8 function createAccount() public {
+
+Declares a public function createAccount() (anyone can call).
+
+No inputs, no outputs.
+
+9 balances[msg.sender] = 0;
+
+msg.sender is the caller’s address.
+
+Sets their stored balance to 0 explicitly.
+
+⚠️ Note: Mappings already default to 0. This line is redundant if the user is new.
+
+⚠️ If the user had a non-zero balance, this resets it to 0 (dangerous).
+
+10 }
+
+Ends createAccount.
+
+11 (blank)
+
+12 // payable is necessary because the function accepts a value (amount) as a parameter (EXTERNAL SOURCE AHE MHANUN)
+
+Comment: mixes ideas. In Solidity, payable means the function can receive Ether (msg.value).
+
+It is not about “accepting a numeric parameter”; any function can accept a number.
+
+13 function deposit(uint256 amount) public payable {
+
+Function deposit takes a number amount and is payable (can receive ETH).
+
+public: callable by anyone.
+
+payable: allows sending Ether with the transaction (in Remix “Value” field).
+
+⚠️ But your function never uses msg.value. So any Ether sent is ignored in logic.
+
+14 balances[msg.sender] += amount;
+
+Increases the caller’s internal ledger by the parameter amount.
+
+⚠️ No real Ether is credited here; just a number in the mapping changes.
+
+If the caller set Remix “Value” to some ETH, that ETH sits in the contract (or tx fails depending on context) but is not tied to this balance.
+
+15 }
+
+Ends deposit.
+
+16 (blank)
+
+17 function withdraw(uint256 amount) public {
+
+Public function to withdraw a number from your internal balance.
+
+No payable needed (not receiving ETH).
+
+18 require(balances[msg.sender] >= amount, "Insufficient balance");
+
+Guard check: if caller’s internal balance < amount, revert with message.
+
+require reverts the whole transaction on failure (state changes undone).
+
+19 balances[msg.sender] -= amount;
+
+Subtracts amount from the internal ledger.
+
+⚠️ Does not send Ether to the caller’s wallet. Only the mapping value changes.
+
+20 }
+
+Ends withdraw.
+
+21 (blank)
+
+22 function transfer(address recipient, uint256 amount) public {
+
+Public function to move internal balance from caller to recipient.
+
+Input 1: recipient is an Ethereum address.
+
+Input 2: amount is a number.
+
+23 require(balances[msg.sender] >= amount, "Insufficient balance");
+
+Check: caller must have at least amount in the ledger.
+
+24 balances[msg.sender] -= amount;
+
+Deducts from caller’s internal balance.
+
+25 balances[recipient] += amount;
+
+Adds to recipient’s internal balance.
+
+⚠️ No Ether is sent to the recipient address; it’s just the mapping.
+
+26 }
+
+Ends transfer.
+
+27 (blank)
+
+28 // view does not modify values within the contract (return kartana lihaycha)
+
+Comment: view means read-only (cannot modify state).
+
+29 function getBalance() public view returns (uint256) {
+
+Public view function that returns a uint256 (the caller’s balance).
+
+30 return balances[msg.sender];
+
+Reads the mapping for the caller and returns the number (default 0 if never set).
+
+31 }
+
+Ends getBalance.
+
+32 }
+
+Ends the Bank contract.

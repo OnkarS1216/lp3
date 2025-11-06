@@ -1,0 +1,255 @@
+// SPDX-License-Identifier: Bhide License
+pragma solidity ^0.8.0;
+
+contract StudentRegistry {
+    struct Student {
+        int id;
+        string name;
+        string department;
+    }
+
+    // Mapping from student ID to Student
+    mapping(int => Student) private students;
+    int[] private studentIds; // To keep track of all IDs for counting
+
+    // Event to log received Ether
+    event ReceivedEther(address indexed sender, uint256 value);
+
+    // Function to receive Ether
+    receive() external payable {
+        emit ReceivedEther(msg.sender, msg.value);
+    }
+
+    fallback() external payable {
+        emit ReceivedEther(msg.sender, msg.value);
+    }
+
+    // Add a new student
+    function addStudent(int id, string memory name, string memory department) public {
+        require(bytes(students[id].name).length == 0, "Student ID already exists");
+        students[id] = Student(id, name, department);
+        studentIds.push(id);
+    }
+
+    // Get a student by ID
+    function getStudent(int id) public view returns (int, string memory, string memory) {
+        require(bytes(students[id].name).length != 0, "Student not found");
+        Student memory s = students[id];
+        return (s.id, s.name, s.department);
+    }
+
+    // Get total number of students
+    function getStudentCount() public view returns (uint256) {
+        return studentIds.length;
+    }
+}
+
+✅ Code with Each Line Explained
+// SPDX-License-Identifier: Bhide License
+
+
+This is a license identifier comment.
+
+It tells tools what license the code uses.
+
+It does not affect contract execution.
+
+pragma solidity ^0.8.0;
+
+
+This tells the compiler which Solidity version to use.
+
+^0.8.0 means use 0.8.0 or higher, but below 0.9.0.
+
+Version 0.8+ has built-in protection for integer overflow.
+
+contract StudentRegistry {
+
+
+Declares a new smart contract named StudentRegistry.
+
+A contract is similar to a class in OOP.
+
+    struct Student {
+        int id;
+        string name;
+        string department;
+    }
+
+
+struct is a user-defined data type.
+
+It groups related data together.
+
+Each student has:
+
+id (integer),
+
+name (string),
+
+department (string).
+
+    mapping(int => Student) private students;
+
+
+mapping is like a dictionary / key-value store.
+
+Key = student id, Value = Student struct.
+
+private means only functions inside this contract can directly access it.
+
+    int[] private studentIds;
+
+
+studentIds is a dynamic array.
+
+It stores all student IDs in order to keep count of total students.
+
+private means only inside contract usage.
+
+    event ReceivedEther(address indexed sender, uint256 value);
+
+
+event is used to log information to the blockchain.
+
+Here, it logs when Ether is sent to the contract.
+
+indexed allows filtering event logs by sender address.
+
+    receive() external payable {
+        emit ReceivedEther(msg.sender, msg.value);
+    }
+
+
+receive() is a special function automatically called when:
+
+Someone sends Ether to contract,
+
+With no function call data.
+
+external → can only be called outside the contract.
+
+payable → allows the contract to accept Ether.
+
+emit fires the event and records who sent Ether and how much.
+
+    fallback() external payable {
+        emit ReceivedEther(msg.sender, msg.value);
+    }
+
+
+fallback() is called when:
+
+A function that does not exist is called,
+
+Or data is sent with the transaction.
+
+Also payable, so it accepts Ether too.
+
+Logs the action same as receive().
+
+    function addStudent(int id, string memory name, string memory department) public {
+
+
+Function to add a new student.
+
+Parameters:
+
+id: integer student ID
+
+name: stored in memory during execution
+
+department: stored in memory
+
+public → any user or contract can call it.
+
+        require(bytes(students[id].name).length == 0, "Student ID already exists");
+
+
+require enforces a condition.
+
+Checks if student does NOT already exist.
+
+We check by verifying name length = 0 (means empty, means student not added yet).
+
+If false → revert with error "Student ID already exists".
+
+        students[id] = Student(id, name, department);
+
+
+Stores the new student in the mapping.
+
+Creates a new Student struct and assigns it to key id.
+
+        studentIds.push(id);
+
+
+Saves ID in array to keep track of total students.
+
+push() adds a value at end of array.
+
+    }
+
+
+End of addStudent() function.
+
+    function getStudent(int id) public view returns (int, string memory, string memory) {
+
+
+Function to read student details.
+
+view → means it does not change contract data.
+
+Returns student ID, name, department.
+
+        require(bytes(students[id].name).length != 0, "Student not found");
+
+
+Checks if student exists.
+
+If name is empty, student was never added → revert with error.
+
+        Student memory s = students[id];
+
+
+Creates a temporary copy s of student data in memory.
+
+        return (s.id, s.name, s.department);
+
+
+Returns the values stored in struct.
+
+    }
+
+
+End of getStudent() function.
+
+    function getStudentCount() public view returns (uint256) {
+        return studentIds.length;
+    }
+
+
+Returns total number of students added.
+
+.length returns size of array.
+
+view means read-only and costs no gas when called locally.
+
+}
+
+
+End of contract.
+
+⭐ What Outputs You Will See in Remix
+Function	Output Example
+addStudent(1, "Onkar", "Computer")	No direct output; student is stored
+getStudent(1)	1, "Onkar", "Computer"
+getStudentCount()	1
+Sending Ether to Contract	Event shows: ReceivedEther(sender, amount)
+🎤 Viva Short Answers
+Question	Answer
+What is struct?	A user-defined composite datatype to store multiple values.
+Why mapping + array?	Mapping stores data; Array allows counting and listing IDs.
+When is receive() used?	When contract gets Ether without data.
+When is fallback() used?	When function does not exist OR data is sent.
+Does getStudent() use gas?	No, it's a view read-only call.
