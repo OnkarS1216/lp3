@@ -1,0 +1,234 @@
+🧩 Problem Idea
+
+We have to place N queens on an N×N chessboard so that:
+
+No two queens attack each other.
+
+Queens attack along rows, columns, and diagonals.
+
+🧱 Code Explanation (Every Line)
+def print_board(board):
+    for row in board:
+        print(" ".join(row))
+    print()
+
+
+Purpose: Prints the chessboard nicely.
+
+board is a 2D list (like a matrix) made of "." (empty) and "Q" (queen).
+
+" ".join(row) joins all elements of the row with spaces.
+
+Example: ["Q", ".", ".", "."] → "Q . . ."
+
+def is_safe(board, row, col, n):
+
+
+Checks if a queen can be safely placed at position (row, col).
+
+🧩 Step-by-step inside is_safe
+    # check column
+    for i in range(row):
+        if board[i][col] == "Q":
+            return False
+
+
+Looks vertically up in the same column.
+
+If any previous row already has a "Q" in the same column → return False.
+
+    # check left diagonal
+    i, j = row - 1, col - 1
+    while i >= 0 and j >= 0:
+        if board[i][j] == "Q":
+            return False
+        i -= 1
+        j -= 1
+
+
+Checks the upper-left diagonal.
+
+Moves diagonally up and left (↖).
+
+If it finds any "Q" → not safe.
+
+    # check right diagonal
+    i, j = row - 1, col + 1
+    while i >= 0 and j < n:
+        if board[i][j] == "Q":
+            return False
+        i -= 1
+        j += 1
+
+
+Checks the upper-right diagonal (↗).
+
+Same logic: if any "Q" found → not safe.
+
+    return True
+
+
+If no queen conflicts found → the spot is safe.
+
+def solve_n_queens(board, row, n):
+
+
+Recursive function that tries to place queens row by row.
+
+Base idea: Place one queen in each row safely using recursion.
+
+Inside solve_n_queens
+    if row == n:
+        print_board(board)
+        return
+
+
+Base case: If we have reached past the last row, all queens are placed → print board (solution found).
+
+    for col in range(n):
+        if is_safe(board, row, col, n):
+            board[row][col] = "Q"
+            solve_n_queens(board, row + 1, n)
+            board[row][col] = "."
+
+
+Loops through each column in current row.
+
+If (row, col) is safe:
+
+Place queen ("Q").
+
+Move to next row (row+1) → recursion.
+
+When done, remove queen (".") → backtracking step (try next position).
+
+n = 4
+board = [["."] * n for _ in range(n)]
+board[0][1] = "Q"  # first queen placed
+print("Initial Board:")
+print_board(board)
+print("Solutions:")
+solve_n_queens(board, 1, n)
+
+
+Creates a 4×4 empty board.
+
+Puts one queen manually at row 0, column 1.
+
+Prints initial board.
+
+Calls solver starting from row 1 (since first row is filled).
+
+🧮 Dry Run (n = 4)
+Initial board
+. Q . .
+. . . .
+. . . .
+. . . .
+
+Step 1 → Start at row 1
+
+Try all columns one by one.
+
+Column	Safe?	Action
+0	❌ (same diagonal as first Q)	skip
+1	❌ (same column)	skip
+2	✅ safe	place Q
+3	❌ (same diagonal)	skip
+
+Board becomes:
+
+. Q . .
+. . Q .
+. . . .
+. . . .
+
+Step 2 → row 2
+
+Try each column:
+
+Col	Safe?	Action
+0	✅ safe	place Q
+others	later checked after backtracking	
+
+Board:
+
+. Q . .
+. . Q .
+Q . . .
+. . . .
+
+Step 3 → row 3
+
+Try each column:
+
+Col	Safe?
+0	❌ same column
+1	❌ diagonal
+2	❌ column conflict
+3	✅ safe
+
+Board:
+
+. Q . .
+. . Q .
+Q . . .
+. . . Q
+
+
+✅ Solution 1 found!
+
+Printed board:
+
+. Q . .
+. . Q .
+Q . . .
+. . . Q
+
+
+Now backtrack — remove last queen and try other positions for previous rows.
+
+Step 4 → Backtracking
+
+Remove the last queen and try next columns in row 2 and row 1 until another valid configuration is found.
+
+Eventually, the program finds the second valid solution:
+
+. Q . .
+. . . Q
+Q . . .
+. . Q .
+
+
+✅ Final Output:
+
+Initial Board:
+. Q . .
+. . . .
+. . . .
+. . . .
+
+Solutions:
+. Q . .
+. . Q .
+Q . . .
+. . . Q
+
+. Q . .
+. . . Q
+Q . . .
+. . Q .
+
+🔁 What’s Happening in Simple Terms
+
+1️⃣ Try placing a queen in each row, one per row.
+2️⃣ If it’s safe → move to next row.
+3️⃣ If you can’t place anywhere → go back to previous row and try a new spot (backtracking).
+4️⃣ Continue until all queens are placed.
+
+💡 Key Concepts Learned
+Concept	Meaning
+Backtracking	Trying all possibilities step by step, and going back if a path fails.
+Recursive Function	Function calling itself to handle smaller parts of the same problem.
+Base Case	When all rows are filled — print solution.
+is_safe()	Prevents attacking queens (same column or diagonals).
