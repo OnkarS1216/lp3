@@ -1,0 +1,146 @@
+🧩 Step 1: Input Data
+weights = [10, 20, 30]
+profits = [60, 100, 120]
+capacity = 50  # total capacity M
+
+
+weights → list of each item’s weight.
+
+profits → list of each item’s profit/value.
+
+capacity (M) → the total weight limit your knapsack can carry (50 units).
+
+So we have:
+
+Item	Weight	Profit
+1	10	60
+2	20	100
+3	30	120
+🧩 Step 2: Combine all items into one list
+items = []
+for i in range(len(weights)):
+    ratio = profits[i] / weights[i]
+    items.append((profits[i], weights[i], ratio))
+
+
+Let’s go word by word:
+
+items = []
+
+Create an empty list to store all items together (profit, weight, ratio).
+
+for i in range(len(weights))
+
+Loops through each index i (0, 1, 2) for all items.
+
+ratio = profits[i] / weights[i]
+
+Calculate profit per unit weight (value density).
+
+Example:
+
+Item 1: 60/10 = 6.0
+
+Item 2: 100/20 = 5.0
+
+Item 3: 120/30 = 4.0
+
+items.append((profits[i], weights[i], ratio))
+
+Add a tuple (profit, weight, ratio) to the list.
+
+After loop:
+
+items = [
+    (60, 10, 6.0),
+    (100, 20, 5.0),
+    (120, 30, 4.0)
+]
+
+🧩 Step 3: Sort items by ratio (descending order)
+items.sort(key=lambda x: x[2], reverse=True)
+
+
+✅ As explained earlier:
+
+key=lambda x: x[2] → Sort by the 3rd value (ratio).
+
+reverse=True → Highest ratio first.
+
+Since 6.0 > 5.0 > 4.0, order remains the same here.
+
+🧩 Step 4: Initialize profit and remaining capacity
+P = 0  # total profit
+M = capacity
+
+
+P keeps track of the total profit earned.
+
+M is how much capacity is still left.
+
+Initially:
+
+P = 0
+M = 50
+
+🧩 Step 5: Pick items greedily
+for profit, weight, ratio in items:
+    if M > 0 and weight <= M:
+        M = M - weight
+        P = P + profit
+    else:
+        break
+
+
+Let’s dry run 👇
+
+🔹 First item → (60, 10, 6.0)
+
+M = 50, weight = 10, so fits fully ✅
+
+M = 50 - 10 = 40
+
+P = 0 + 60 = 60
+
+🔹 Second item → (100, 20, 5.0)
+
+M = 40, weight = 20, fits ✅
+
+M = 40 - 20 = 20
+
+P = 60 + 100 = 160
+
+🔹 Third item → (120, 30, 4.0)
+
+M = 20, but weight = 30, doesn’t fully fit ❌
+
+So we go to fractional part after the loop.
+
+🧩 Step 6: Take fractional part if capacity left
+if M > 0:
+    P = P + profit * (M / weight)
+
+
+profit = 120, weight = 30, M = 20
+
+Fraction taken = 20 / 30 = 0.6667
+
+Fractional profit = 120 * 0.6667 = 80
+
+Add to total:
+P = 160 + 80 = 240
+
+🧩 Step 7: Final Output
+print("Maximum Profit =", P)
+
+
+✅ Output:
+
+Maximum Profit = 240.0
+
+🧠 Summary of Concept
+Item	Weight	Profit	Ratio	Taken
+1	10	60	6.0	full
+2	20	100	5.0	full
+3	30	120	4.0	20/30 = 2/3
+Total				Profit = 240
