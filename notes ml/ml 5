@@ -1,0 +1,543 @@
+🧩 1. Import Libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+
+Explanation:
+
+pandas → used to load, handle, and process data (tables).
+
+matplotlib.pyplot → used to create graphs and charts (for visualization).
+
+StandardScaler → helps standardize data (so all features have equal weight).
+
+KMeans → algorithm for K-Means Clustering.
+
+dendrogram, linkage, fcluster → used for Hierarchical Clustering and its visualization.
+
+📂 2. Load Dataset
+df = pd.read_csv(r"C:\Users\Hp\Downloads\ml\6. KMeans on Sales\sales_data_sample.csv", encoding='latin1')
+print("Dataset loaded successfully!")
+print(df.head())
+
+
+Explanation:
+
+pd.read_csv(...) → reads the dataset file from your computer.
+
+r before the path means raw string (so backslashes are not treated as special characters).
+
+encoding='latin1' → fixes text character errors (used when CSV has special symbols).
+
+df → DataFrame (like a big Excel table in Python).
+
+df.head() → prints the first 5 rows for quick preview.
+
+Input: CSV file
+Output: First few rows of the dataset printed.
+
+🔢 3. Select Numeric Columns
+numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
+X = df[numeric_cols]
+
+
+Explanation:
+
+select_dtypes(...) → selects only numeric columns (integers & decimals).
+
+numeric_cols → stores the names of those columns.
+
+X → dataset with only numeric data (used for clustering, since clustering needs numbers).
+
+⚖️ 4. Standardize the Data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+
+Explanation:
+
+StandardScaler() → creates a scaler object.
+
+.fit_transform(X) →
+
+fit() learns the mean and standard deviation of the data.
+
+transform() standardizes it so each column has:
+
+mean = 0
+
+standard deviation = 1
+
+X_scaled → the scaled version of data ready for clustering.
+
+💡 Why standardize?
+Because features with large values (like SALES) can dominate smaller ones.
+
+📈 5. Elbow Method for K-Means
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=42)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+
+Explanation:
+
+wcss → Within-Cluster Sum of Squares, a measure of how tight clusters are.
+
+Loop for i in range(1, 11) → tests cluster counts from 1 to 10.
+
+KMeans(n_clusters=i) → creates KMeans with i clusters.
+
+.fit(X_scaled) → applies the algorithm to the data.
+
+.inertia_ → gives total WCSS for that i.
+
+Appends each result to the list wcss.
+
+Next, we visualize it 👇
+
+plt.figure(figsize=(8,5))
+plt.plot(range(1, 11), wcss, marker='o')
+plt.title('Elbow Method')
+plt.xlabel('Number of Clusters (k)')
+plt.ylabel('WCSS')
+plt.show()
+
+
+Explanation:
+
+Draws a line graph of WCSS vs number of clusters.
+
+The "elbow point" (where curve bends) shows the best value of k (ideal cluster number).
+
+💡 6. K-Means Clustering
+k = 4   # choose based on elbow plot
+kmeans = KMeans(n_clusters=k, random_state=42)
+df['KMeans_Cluster'] = kmeans.fit_predict(X_scaled)
+
+
+Explanation:
+
+We choose k = 4 after checking the elbow plot.
+
+Creates a KMeans model with 4 clusters.
+
+.fit_predict() → runs the algorithm and gives cluster labels (0,1,2,3).
+
+Adds those cluster numbers as a new column KMeans_Cluster in your dataset.
+
+Then print:
+
+print("\nK-Means Clustering Result:")
+print(df[['KMeans_Cluster'] + list(numeric_cols)].head())
+
+
+Output:
+Shows the numeric columns with the cluster number assigned to each row.
+
+🌳 7. Hierarchical Clustering
+linked = linkage(X_scaled, method='ward')
+
+
+Explanation:
+
+linkage() → builds the hierarchy between data points.
+
+method='ward' → minimizes the variance between clusters (most common method).
+
+Then plot a dendrogram:
+
+plt.figure(figsize=(10, 7))
+dendrogram(linked, orientation='top', distance_sort='descending', show_leaf_counts=True)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.show()
+
+
+Explanation:
+
+dendrogram() → tree-like diagram showing how clusters are formed.
+
+You can visually decide how many clusters make sense (by drawing a horizontal line).
+
+Next, assign clusters from it:
+
+df['Hier_Cluster'] = fcluster(linked, k, criterion='maxclust')
+
+
+Explanation:
+
+fcluster() → cuts the dendrogram into k clusters.
+
+Adds them as a new column Hier_Cluster to your dataset.
+
+Finally:
+
+print("\nHierarchical Clustering Result:")
+print(df[['Hier_Cluster'] + list(numeric_cols)].head())
+
+
+Output:
+Shows numeric columns with the hierarchical cluster assigned.
+
+🧠 Summary Table
+Step	Code Section	Purpose	Output
+1	Import libraries	Load required tools	—
+2	Load dataset	Load CSV into DataFrame	Table preview
+3	Select numeric columns	Choose numerical data for clustering	Numeric DataFrame
+4	Standardize data	Equalize scale of all features	X_scaled
+5	Elbow Method	Find best number of clusters (k)	Elbow Plot
+6	K-Means	Apply clustering	Cluster labels in df
+7	Hierarchical	Apply tree-based clustering	Dendrogram + Cluster labels
+
+
+
+
+
+
+
+solutely 👍 Let’s understand Hierarchical Clustering in a very easy and clear way — perfect for your practical file and viva.
+
+💡 What is Hierarchical Clustering?
+
+Hierarchical Clustering is an unsupervised machine learning technique that groups similar data points into clusters —
+but instead of fixing the number of clusters (like K-Means), it builds a hierarchy or tree of clusters.
+
+It’s like organizing things into a family tree 👨‍👩‍👧‍👦:
+
+Small clusters join together to form bigger clusters
+
+Bigger clusters combine further
+
+Finally, all points belong to one big cluster
+
+🧩 Types of Hierarchical Clustering
+
+There are two types:
+
+Agglomerative (Bottom-Up) — most common
+
+Start with each data point as its own cluster
+
+Then, step by step, merge the two closest clusters
+
+Keep merging until all points form one cluster
+
+Divisive (Top-Down)
+
+Start with all data points in one cluster
+
+Then split clusters repeatedly until each point is alone
+
+(Used less often)
+
+⚙️ How Agglomerative Hierarchical Clustering Works
+
+Let’s go step-by-step 👇
+
+Start: Each point is a separate cluster.
+
+Find the closest pair of clusters (using distance measures like Euclidean distance).
+
+Merge them into a single cluster.
+
+Recalculate the distances between the new cluster and other clusters.
+
+Repeat steps 2–4 until only one cluster remains.
+
+📊 Example
+
+Let’s say you have 5 sales records.
+
+At first → 5 individual clusters
+
+Merge the most similar 2 → now 4 clusters
+
+Merge the next 2 → now 3 clusters
+
+Continue until everything is in one large group
+
+This merging process forms a tree structure called a Dendrogram 🌳
+
+🌳 What is a Dendrogram?
+
+A dendrogram is a tree-like diagram that shows how clusters are formed step by step.
+
+The bottom shows individual points
+
+The branches show how they merge
+
+The height of the branch shows how far apart clusters were when merged
+
+👉 You can draw a horizontal line across the dendrogram —
+the number of branches that cross this line = number of clusters.
+
+🧮 Distance Measurement Methods
+
+When merging clusters, we can measure the distance between them in different ways:
+
+Linkage Type	Meaning
+Single Linkage	Distance between the closest points of two clusters
+Complete Linkage	Distance between the farthest points
+Average Linkage	Average distance between all pairs of points
+Ward’s Method	Minimizes total variance (used in your code)
+
+
+
+
+Sure 👍 here’s a simple, easy-to-understand explanation of K-Means Clustering — the way you can say it in your viva or write in your practical file 👇
+
+💡 What is K-Means Clustering?
+
+K-Means is an unsupervised machine learning algorithm used to group similar data points together into different clusters.
+It’s called unsupervised because the data has no predefined labels — the algorithm itself finds patterns and forms groups.
+
+🧠 Basic Idea
+
+Imagine you have many points scattered on a graph (like customer sales data).
+K-Means tries to:
+
+Group nearby points together into K clusters
+
+Each group (cluster) has a center point called a centroid
+
+So, similar points → same cluster,
+dissimilar points → different clusters.
+
+⚙️ How K-Means Works (Step-by-Step)
+
+Choose the number of clusters (K)
+Example: K = 3 (we want 3 groups)
+
+Initialize centroids randomly
+The algorithm picks K random points as starting “centers.”
+
+Assign each point to the nearest centroid
+Every data point joins the cluster whose centroid is closest (by Euclidean distance).
+
+Recalculate the centroids
+For each cluster, compute the new centroid (average position of all its points).
+
+Repeat steps 3 and 4
+Keep doing this until centroids stop moving much — this means the clusters have stabilized.
+
+📈 Example in Real Life
+
+Suppose you have sales data of customers:
+
+Quantity ordered
+
+Total sales amount
+
+K-Means can group them into:
+
+Cluster 1 → Low spenders
+
+Cluster 2 → Medium spenders
+
+Cluster 3 → High spenders
+
+So businesses can target each group differently.
+
+📊 Visualization
+
+If you plotted it on a graph:
+
+Each color (red, blue, green) shows one cluster
+
+The black dots represent centroids (cluster centers)
+
+🧮 Important Term: WCSS
+
+WCSS (Within-Cluster Sum of Squares)
+→ Measures how close points are to their cluster’s centroid.
+→ Smaller WCSS = better clusters.
+
+We use the Elbow Method to decide the best number of clusters K by checking where the WCSS stops decreasing sharply.
+
+🎯 Summary Table
+Concept	Meaning
+Algorithm Type	Unsupervised Learning
+Goal	Group similar data into K clusters
+Input	Unlabeled numeric data
+Output	Cluster label for each data point
+Uses	Customer segmentation, sales analysis, pattern discovery
+Key Metric	WCSS (Within Cluster Sum of Squares)
+
+✅ In short:
+
+K-Means divides data into K groups where each group’s members are similar to each other and different from members of other groups — it keeps adjusting centers until the clusters are as compact and separate as possible.
+
+
+
+Perfect question 👍 — this is exactly the kind of thing external examiners ask during your practical!
+Let’s clearly break down the Input, Output, and Goal of your K-Means / Hierarchical Clustering on sales_data_sample.csv experiment.
+
+🎯 Title
+
+Implement K-Means and Hierarchical Clustering on Sales Dataset and determine the number of clusters using the Elbow Method.
+
+🧾 Input
+Type	Description
+Dataset	sales_data_sample.csv
+File Format	CSV (Comma Separated Values)
+Attributes (columns)	ORDERNUMBER, QUANTITYORDERED, PRICEEACH, SALES, QTR_ID, MONTH_ID, YEAR_ID, MSRP, etc.
+Data Type	Numeric + Categorical (but only numeric columns are used for clustering)
+
+➡️ In your code, the input to the algorithm is:
+
+X_scaled
+
+
+which is the standardized numeric data extracted from the dataset.
+
+⚙️ Processing / Steps
+
+Load dataset using Pandas.
+
+Select numeric features suitable for clustering.
+
+Standardize data using StandardScaler() to bring all features to the same scale.
+
+Use the Elbow Method to decide the best number of clusters (k).
+
+Apply K-Means clustering using that k value.
+
+Apply Hierarchical clustering to compare results.
+
+Visualize results with Elbow Plot and Dendrogram.
+
+💻 Output
+Type	Description
+Clustered DataFrame	Original data + a new column KMeans_Cluster (for K-Means) and Hier_Cluster (for Hierarchical)
+Elbow Plot	Graph showing WCSS vs Number of Clusters → helps find optimal k
+Dendrogram	Tree diagram showing hierarchical grouping of points
+Cluster Insights	You can now analyze each cluster’s average sales, quantity, etc.
+
+Example output columns in your code:
+
+print(df[['KMeans_Cluster'] + list(numeric_cols)].head())
+
+🎯 Goal / Objective
+
+To group similar sales records together (based on numeric features like quantity, price, and sales) using unsupervised learning algorithms and to find the optimal number of clusters using the Elbow Method.
+
+In simpler words:
+
+🧩 Input: Sales dataset
+
+⚙️ Process: Apply clustering (K-Means & Hierarchical)
+
+📊 Output: Clusters showing groups of similar sales patterns
+
+🎯 Goal: Identify natural groupings (customer segments or order types) in the data — without any prior labels.
+
+✅ Example (Real-world meaning):
+After clustering, you might find:
+
+Cluster 1: Low-quantity, low-sales orders
+
+Cluster 2: Medium-quantity, medium-sales
+
+Cluster 3: High-value, large orders
+
+That’s the business insight you get from clustering.
+
+
+
+
+
+🌳 What the Image Shows
+
+This is a Hierarchical Clustering Dendrogram, which is a tree-like diagram that shows how data points are merged into clusters step by step.
+
+Each small vertical line at the bottom = one data point (like a sales record).
+Each horizontal line = a merge between two clusters.
+
+🧩 How to Read the Dendrogram
+1. Bottom (Leaves): Individual Points
+
+At the bottom of the chart, you have hundreds of small vertical lines.
+Each represents one record (row) from your dataset — initially, every point is its own cluster.
+
+2. Merging Process (Colored Branches)
+
+As you move upward:
+
+Nearby points (similar data) are merged into small clusters (short horizontal lines).
+
+These clusters merge again into bigger clusters.
+
+This continues until everything becomes one large cluster at the very top.
+
+The colors (🟧 orange, 🟩 green, 🟥 red, 🟪 purple) show different clusters formed when the tree was cut at a particular level.
+
+3. Height of Horizontal Lines
+
+The height (Y-axis) represents distance or dissimilarity between clusters:
+
+Short lines = very similar clusters
+
+Tall lines = very different clusters
+
+So, clusters that merge at a lower height are more similar,
+while those merging at a higher height are more distinct.
+
+4. Finding the Number of Clusters
+
+To decide how many clusters to form:
+
+Draw a horizontal line (a cut) across the dendrogram.
+
+The number of vertical lines that the cut crosses = number of clusters.
+
+In your case:
+
+If we cut around height ~70 (as seen in the image),
+
+It crosses about 4 main branches (orange, green, red, purple).
+
+✅ That means the optimal number of clusters = 4,
+which matches your K-Means result (k = 4).
+
+📈 Summary of What You’re Seeing
+Visual Element	Meaning
+Bottom lines	Each individual data record
+Merging branches	How clusters are formed step by step
+Height (Y-axis)	Dissimilarity or distance between clusters
+Colors	Final clusters after cutting the tree
+Top horizontal merge	When all data finally become one big cluster
+🎯 Conclusion (What to Say in Viva)
+
+“This dendrogram shows the step-by-step merging of data points into clusters based on their similarity.
+At lower levels, individual points merge into small clusters, and at higher levels, larger clusters merge.
+By cutting the tree at a certain height, we get around 4 major clusters — which matches the result from the K-Means Elbow Method.”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
