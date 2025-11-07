@@ -1,0 +1,127 @@
+🧩 1. What is Blockchain and Ethereum?
+Term	Meaning
+Blockchain	A shared database (ledger) stored across many computers (nodes). Every new record (called a block) is linked to the previous one — so no one can secretly change history.
+Ethereum	A popular blockchain that not only stores money (like Bitcoin) but also runs programs (smart contracts).
+Smart Contract	A small computer program that lives on the blockchain. It runs automatically when someone interacts with it. It cannot be deleted or changed once deployed.
+Test Network (Testnet)	A fake Ethereum network used for practice (e.g. Sepolia, Holesky). The ETH here has no real value.
+🧠 2. What is Solidity?
+
+Solidity is the programming language used to write smart contracts on Ethereum.
+
+It looks similar to C++ / JavaScript.
+
+The files end with .sol (for example Bank.sol).
+
+A Solidity program (contract) has:
+
+Pragma line → compiler version.
+
+State variables → permanent data stored on blockchain.
+
+Functions → the actions users can perform.
+
+Visibility keywords → public, private, etc.
+
+Special functions → constructor, fallback, receive.
+
+🧮 3. Our Practical Aim
+
+Assignment 3 – Bank Account Smart Contract
+
+We want a mini-bank that lets a customer:
+
+Deposit money
+
+Withdraw money
+
+Check their balance
+
+Each customer is identified by their Ethereum address (like an account number).
+
+💻 4. Full Code
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Bank {
+    mapping(address => uint256) private balances;
+
+    // Deposit Ether into the bank
+    function deposit() public payable {
+        require(msg.value > 0, "Send some Ether");
+        balances[msg.sender] += msg.value;
+    }
+
+    // Withdraw Ether from your account
+    function withdraw(uint256 amount) public {
+        require(amount > 0, "Amount > 0");
+        require(balances[msg.sender] >= amount, "Insufficient funds");
+        balances[msg.sender] -= amount;
+        (bool ok, ) = payable(msg.sender).call{value: amount}("");
+        require(ok, "Transfer failed");
+    }
+
+    // Check your current balance
+    function getBalance() public view returns (uint256) {
+        return balances[msg.sender];
+    }
+}
+
+🧩 5. Line-by-Line Explanation
+Line	Code	What It Does
+1	// SPDX-License-Identifier: MIT	A comment telling Remix the license type (optional for running).
+2	pragma solidity ^0.8.0;	Use Solidity v0.8 or higher (safe math built in).
+3	contract Bank {	Starts the contract named Bank. Think of it like a class.
+4	mapping(address => uint256) private balances;	A mapping (like dictionary) that links each wallet address to their balance in wei.
+5–8	function deposit() public payable { ... }	Allows anyone to send ETH to contract. msg.value is the amount sent. payable lets function receive ETH. The balance of sender increases.
+9–15	function withdraw(uint256 amount)	Lets user withdraw ETH back. Checks: (1) amount > 0, (2) enough balance. Subtracts from mapping, then sends ETH back using call{value: amount}.
+16–18	function getBalance()	Read-only (view) function; returns user’s current stored balance.
+19	}	Ends contract.
+⚙️ 6. How It Works on Remix
+
+Open Remix IDE → https://remix.ethereum.org
+
+Create new file → Bank.sol
+
+Paste the code
+
+Compile → click 🧱 Compiler (choose 0.8.x)
+
+Deploy → Under Deploy & Run Transactions
+
+Environment = Remix VM (Sandbox) or Injected Provider (MetaMask Testnet).
+
+After deploying, buttons appear: deposit, withdraw, getBalance.
+
+🧾 7. Inputs & Outputs
+Action	Input You Give	Output You See	What Happens
+Deposit	In Remix “Value” field → e.g. 0.1 ether	No text; state changes	0.1 ETH added to your on-chain balance
+Withdraw	Call withdraw(10000000000000000) (= 0.01 ETH)	No text; wallet receives ETH	ETH sent back to your account
+Get Balance	Click button (no input)	Returns number in wei (e.g. 100000000000000000)	That equals 0.1 ETH
+⛽ 8. Gas & Transaction Fee
+
+Every transaction that changes blockchain state (deposit/withdraw) uses gas.
+
+Reading data (getBalance) is free off-chain.
+
+Gas Used × Gas Price = Transaction Fee.
+
+You can see these values in Remix console or Etherscan (for testnet).
+
+🎤 9. Viva Quick Answers
+Question	Short Answer
+What is Solidity?	A language to write smart contracts on Ethereum.
+What is a Smart Contract?	Code that runs automatically on the blockchain when called.
+What is msg.sender?	The address (account) that called the function.
+What is msg.value?	The amount of Ether (in wei) sent with the transaction.
+Why payable?	It allows the function to receive Ether.
+What is a mapping?	Key-value store; here it maps each address to its balance.
+Why require?	To check conditions and stop execution if false.
+What is gas?	A fee paid for running computations on the blockchain.
+🧠 10. Simple Flow
+
+1️⃣ User deploys contract.
+2️⃣ User calls deposit() and sends Ether.
+3️⃣ Contract stores balance under user’s address.
+4️⃣ User calls getBalance() to check it.
+5️⃣ User calls withdraw(amount) to get money back.
+6️⃣ Ethereum network records all these transactions publicly.
