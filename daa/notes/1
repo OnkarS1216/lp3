@@ -1,0 +1,160 @@
+🧮 FIBONACCI NUMBERS – THEORY NOTES
+🔹 Definition
+
+The Fibonacci sequence is a series of numbers where each number is the sum of the two numbers before it.
+
+👉 Formula:
+
+𝐹
+(
+𝑛
+)
+=
+𝐹
+(
+𝑛
+−
+1
+)
++
+𝐹
+(
+𝑛
+−
+2
+)
+F(n)=F(n−1)+F(n−2)
+
+with
+
+𝐹
+(
+0
+)
+=
+0
+,
+𝐹
+(
+1
+)
+=
+1
+F(0)=0,F(1)=1
+🔹 Example Sequence
+n	0	1	2	3	4	5	6	7	8	9
+F(n)	0	1	1	2	3	5	8	13	21	34
+🔹 Purpose
+
+Fibonacci numbers are widely used in:
+
+Mathematics – sequences and series problems
+
+Computer Science – recursion, dynamic programming, and algorithm design
+
+Nature & Art – spirals in shells, flowers, etc.
+
+⚙️ PROGRAM EXPLANATION
+🧩 1. Recursive Method
+🧠 Logic:
+
+Recursion means a function calling itself.
+
+🧾 Code:
+def fib_recursive(n):
+    if n <= 1:
+        return n
+    else:
+        return fib_recursive(n - 1) + fib_recursive(n - 2)
+
+🔍 Line-by-line Explanation:
+
+if n <= 1:
+→ For the first two numbers (0 and 1), directly return n.
+
+else:
+→ For all other numbers, call the same function for (n-1) and (n-2) and add them.
+
+This keeps happening until base condition (n <= 1) is reached.
+
+📊 Example (dry run for n = 5):
+fib(5)
+= fib(4) + fib(3)
+= (fib(3)+fib(2)) + (fib(2)+fib(1))
+= ((fib(2)+fib(1)) + (fib(1)+fib(0))) + ((fib(1)+fib(0)) + 1)
+= ...
+= 5
+
+⚡ Output for n = 10:
+0 1 1 2 3 5 8 13 21 34
+
+⚙️ Time Complexity:
+
+O(2ⁿ) (very slow for large n because it repeats calculations)
+
+Space Complexity: O(n) (due to recursive calls)
+
+🧩 2. Non-Recursive (Iterative / Loop) Method
+🧠 Logic:
+
+We calculate Fibonacci numbers using a loop, storing the last two numbers and updating them each time.
+
+🧾 Code:
+def fib_non_recursive(n):
+    a = 0
+    b = 1
+    for i in range(n):
+        print(a, end=" ")
+        c = a + b
+        a = b
+        b = c
+
+🔍 Line-by-line Explanation:
+
+a = 0, b = 1 → starting values
+
+for i in range(n): → loop runs n times
+
+print(a, end=" ") → prints current Fibonacci number
+
+c = a + b → find next number
+
+a = b → shift a to next value
+
+b = c → shift b to next value
+
+This continues until we print all Fibonacci numbers up to n terms.
+
+⚡ Output for n = 10:
+0 1 1 2 3 5 8 13 21 34
+
+⚙️ Time Complexity:
+
+O(n) (much faster)
+
+Space Complexity: O(1) (no recursion, just variables)
+
+🧾 Final Output (Full Program)
+Recursive Fibonacci:
+0 1 1 2 3 5 8 13 21 34
+Non-Recursive Fibonacci:
+0 1 1 2 3 5 8 13 21 34
+
+🔍 Difference Between Recursive and Non-Recursive
+Feature	Recursive	Non-Recursive
+Approach	Function calls itself	Uses a loop
+Speed	Slow (repeats work)	Fast
+Memory Use	More (stack calls)	Less
+Complexity	O(2ⁿ)	O(n)
+Simplicity	Conceptually simple	Logically simple
+🧠 Key Points to Remember
+
+Fibonacci follows: F(n) = F(n−1) + F(n−2)
+
+Base cases: F(0) = 0, F(1) = 1
+
+Recursion is elegant but inefficient.
+
+Iteration is faster and uses less memory.
+
+Would you like me to give you a handwritten-style short summary note (for exam or viva) — like “definition + logic + dry run + output in one page”?
