@@ -1,0 +1,350 @@
+🧠 Problem Statement (in simple words)
+We have:
+
+
+Some items, each having a weight and a profit/value.
+
+
+A bag (knapsack) that can hold a maximum weight W.
+
+
+We want to select items to:
+👉 maximize profit,
+👉 without exceeding the bag’s weight capacity.
+
+📜 The Code
+def knapSack(W, wt, val, n): 
+
+🔹 W → Total weight capacity of the knapsack
+🔹 wt → List of item weights
+🔹 val → List of item values (profits)
+🔹 n → Number of items we have
+This function returns maximum profit we can get.
+
+Base Case
+    if n == 0 or W == 0: 
+        return 0
+
+👉 If there are no items left (n == 0)
+OR
+👉 The bag’s capacity is 0 (W == 0)
+➡️ We can’t take anything, so profit = 0
+
+When current item’s weight is more than bag capacity
+    if (wt[n-1] > W): 
+        return knapSack(W, wt, val, n-1)
+
+
+
+wt[n-1] = weight of the nth item (because list index starts at 0)
+
+
+If the item is too heavy, we skip it
+→ We call function again without that item
+
+
+
+Otherwise, we have 2 choices:
+    else: 
+        return max( 
+            val[n-1] + knapSack(W-wt[n-1], wt, val, n-1), 
+            knapSack(W, wt, val, n-1))
+
+We can:
+
+
+Include the item
+
+
+Add its value → val[n-1]
+
+
+Reduce capacity → W - wt[n-1]
+
+
+Then find best result for remaining items → knapSack(W-wt[n-1], wt, val, n-1)
+
+
+
+
+Exclude the item
+
+
+Don’t take its value → just call knapSack(W, wt, val, n-1)
+
+
+
+
+Then take the maximum of the two.
+
+Main function part
+if __name__ == '__main__': 
+    profit = [60, 100, 120] 
+    weight = [10, 20, 30] 
+    W = 50
+    n = len(profit) 
+    print(knapSack(W, weight, profit, n))
+
+We have:
+ItemWeightValue11060220100330120
+Bag capacity = 50
+
+🧮 Dry Run (Step-by-Step)
+Step 1:
+Call → knapSack(50, [10,20,30], [60,100,120], 3)
+Item 3 weight = 30 ≤ 50 → ✅ can include or exclude.
+Two cases:
+1️⃣ Include item 3
+Profit = 120 + knapSack(20, [10,20,30], [60,100,120], 2)
+2️⃣ Exclude item 3
+Profit = knapSack(50, [10,20,30], [60,100,120], 2)
+
+Case 1 → Include item 3:
+knapSack(20, ..., 2)
+Now item 2 weight = 20 → can include.
+
+
+Include: 100 + knapSack(0, ..., 1) = 100 + 0 = 100
+
+
+Exclude: knapSack(20, ..., 1) = 60 (since item1 fits)
+
+
+→ max(100, 60) = 100
+So including item3 gives → 120 + 100 = 220
+
+Case 2 → Exclude item 3:
+knapSack(50, ..., 2)
+Item 2 (weight 20) fits.
+
+
+Include: 100 + knapSack(30, ..., 1)
+
+
+Item1 (10) fits → 60 + 0 = 60
+
+
+So = 100 + 60 = 160
+
+
+
+
+Exclude: knapSack(50, ..., 1) = 60
+
+
+→ max(160, 60) = 160
+
+Compare both cases:
+Include item3 → 220
+Exclude item3 → 160
+✅ Maximum profit = 220
+
+✅ Final Output:
+220
+
+
+🧩 Summary (in plain words)
+StepDecisionRemaining WeightProfitInclude item 3 (30,120)20+120Include item 2 (20,100)0+100Total—220
+
+Would you like me to also draw the recursion tree diagram (in text form) showing each branch include/exclude for better understanding?
+
+
+
+
+What is the problem?
+
+You have a bag that can hold up to a certain weight (W).
+You have some items, each with:
+
+a weight, and
+
+a profit/value.
+
+You want to put items in the bag to get maximum total profit,
+but you can’t go over the weight limit of the bag.
+
+🧩 Example
+Item	Weight	Profit
+1	10	60
+2	20	100
+3	30	120
+
+Bag Capacity (W) = 50
+
+🧰 Think like this:
+
+You can choose any combination of items,
+but total weight ≤ 50.
+You want to get maximum profit.
+
+Let’s list possible combinations 👇
+
+Items Taken	Total Weight	Total Profit
+1 only	10	60
+2 only	20	100
+3 only	30	120
+1 + 2	30	160
+1 + 3	40	180
+2 + 3	50	220 ✅ (best)
+1 + 2 + 3	60 ❌ (too heavy)	
+
+So the best choice = Item 2 + Item 3
+Total weight = 20 + 30 = 50
+Total profit = 100 + 120 = 220
+
+⚙️ What the code is doing (in simple talk)
+1️⃣ It checks:
+
+👉 Are we out of items OR is the bag full?
+→ If yes → profit = 0
+
+2️⃣ It checks the current item:
+
+👉 Is it too heavy to fit?
+→ If yes → skip it
+
+3️⃣ Otherwise, it tries two options:
+
+Take the item → add its profit → reduce weight
+
+Don’t take the item → skip it
+
+Then choose whichever gives more profit.
+
+🧮 Dry Run (like story)
+
+We start with:
+
+Bag = 50 kg
+Items = [10kg, 20kg, 30kg]
+Profit = [60, 100, 120]
+
+Step 1: Look at last item (30kg, 120)
+
+It fits (30 ≤ 50)
+
+If we take it, bag left = 20kg, profit = 120
+
+If we don’t take it, bag left = 50kg, profit = 0
+
+Let’s check both options.
+
+Option 1: We take item 3
+
+Now bag = 20kg left
+Next item = item 2 (20kg, 100)
+
+It fits perfectly → take it → profit = 120 + 100 = 220
+
+✅ So total profit = 220
+
+Option 2: We don’t take item 3
+
+Now bag = 50kg, items = 1 and 2 left
+We can take both (10 + 20 = 30kg)
+Profit = 60 + 100 = 160
+
+Compare:
+
+Take item 3 → Profit = 220
+
+Skip item 3 → Profit = 160
+
+✅ Best = 220
+
+🏁 Final Answer:
+
+
+
+
+🧠 The confusion:
+
+You’re asking —
+👉 “Why does the iteration (or checking) start from the last item in the list?”
+
+Let’s break it down.
+
+🧩 The function:
+def knapSack(W, wt, val, n):
+
+
+Here,
+
+n = number of items
+
+We always use wt[n-1] and val[n-1]
+
+🧮 Example values:
+wt = [10, 20, 30]
+val = [60, 100, 120]
+n = 3
+
+
+So:
+
+wt[n-1] = wt[2] = 30
+
+val[n-1] = val[2] = 120
+
+That means we are looking at the last item first (Item 3).
+
+💡 Why start from the last item?
+
+Because of how recursion works —
+it’s easy to reduce the problem size step by step.
+
+We start with all items (n = 3),
+and each recursive call removes one item from the end.
+
+Example:
+
+Start → knapSack(W=50, n=3) → considers item 3
+
+If included/excluded → calls knapSack(..., n=2) → now item 2
+
+Again → calls knapSack(..., n=1) → now item 1
+
+Finally → knapSack(..., n=0) → no items left → stop.
+
+🧩 Think of it like a countdown:
+n = 3 → check item 3
+n = 2 → check item 2
+n = 1 → check item 1
+n = 0 → stop
+
+
+So recursion goes backward through the list —
+checking the last item first and moving up.
+
+🧭 Why is it easier this way?
+
+Because:
+
+When we reduce n by 1 (n-1), we automatically move to the previous item.
+
+The recursion keeps removing the last item each time,
+so no need for loops.
+
+Eventually, it reaches n == 0 → meaning no items left.
+
+📘 Analogy (Very Simple)
+
+Think like you’re packing items one by one,
+starting from the last in the list:
+
+“Let’s see if I should take the last item.
+If yes, reduce space and move to the next previous item.
+If not, skip it and still move to the previous item.”
+
+That’s exactly what recursion does.
+
+🔁 Summary
+Step	Function Call	Item Checked
+1	knapSack(50, ..., 3)	Item 3 (last)
+2	knapSack(20, ..., 2)	Item 2
+3	knapSack(0, ..., 1)	Item 1
+4	knapSack(..., 0)	Stop (no items left)
+
+✅ So yes — the recursion (or iteration) starts from the last item because of n-1.
+
+Would you like me to show this with a mini diagr
