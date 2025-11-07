@@ -1,0 +1,528 @@
+🧠 Problem Statement — What are we doing?
+We have a set of characters and their frequencies (how often each appears).
+We need to generate Huffman Codes — shorter binary codes for frequent characters and longer ones for rare characters, to compress data efficiently.
+Example input:
+Characters: a, b, c, d, e, f
+Frequencies: 5, 9, 12, 13, 16, 45
+
+
+📘 Step-by-Step Code Explanation
+
+```python
+import heapq
+✅ **Imports the heapq library** —  
+This gives us a **min-heap** (priority queue), where the smallest item is always at the top.
+
+We’ll use it to always pick **two smallest frequencies** when building the Huffman Tree.
+
+---
+
+### ```python
+class Node:
+
+We create a Node class to represent each node in the tree (each character and its frequency).
+
+```python
+def init(self, char, freq):
+self.char = char
+self.freq = freq
+self.left = self.right = None
+Each node stores:
+- `char` → character (like `'a'`)
+- `freq` → frequency (like `5`)
+- `left` and `right` → pointers to child nodes (used to connect the tree)
+
+---
+
+### ```python
+def __lt__(self, other): return self.freq < other.freq
+
+This tells Python how to compare nodes (by frequency).
+So, when using heapq, it knows which node is smaller.
+Example:
+Node('a',5) < Node('b',9) → True
+
+
+🧩 Function 1: huffman_encoding(chars, freqs)
+```python
+heap = [Node(c, f) for c, f in zip(chars, freqs)]
+This line does 3 things:
+1. `zip(chars, freqs)` joins character and frequency together:
+
+[('a',5), ('b',9), ('c',12), ('d',13), ('e',16), ('f',45)]
+2. For each pair, creates a Node → `[Node('a',5), Node('b',9), ...]`
+3. Stores them in a list called `heap`.
+
+---
+
+### ```python
+heapq.heapify(heap)
+
+Turns the list into a min-heap based on frequency.
+Now smallest frequency (like 5) is always on top.
+
+```python
+while len(heap) > 1:
+We repeat until only **one node** (the root) is left — that’s our final Huffman Tree.
+
+---
+
+### ```python
+left, right = heapq.heappop(heap), heapq.heappop(heap)
+
+
+
+Removes the two smallest nodes from the heap.
+
+
+These are combined into a new node.
+
+
+Example (first step):
+Remove 'a'(5) and 'b'(9)
+
+
+```python
+merged = Node(None, left.freq + right.freq)
+- Creates a **new node** with no character (`None`)
+- Its frequency = sum of the two merged nodes.
+
+Example:
+
+New node freq = 5 + 9 = 14
+
+---
+
+### ```python
+merged.left, merged.right = left, right
+
+Connects the two smallest nodes as children of the new merged node.
+Example:
+    (14)
+   /    \
+ (5)    (9)
+
+
+```python
+heapq.heappush(heap, merged)
+Adds the merged node back into the heap.
+
+Now, the heap again sorts nodes by frequency.
+
+---
+
+### ```python
+return heap[0]
+
+After the loop ends, only one node remains → the root of the Huffman tree.
+We return it.
+
+🧩 Function 2: print_codes(node, code="")
+This function prints the Huffman codes for each character.
+
+```python
+if node is None: return
+Stops if there’s no node (base case).
+
+---
+
+### ```python
+if node.char: print(f"{node.char}: {code}")
+
+If the node has a character (i.e., a leaf node), print its code.
+Example output:
+a: 1100
+b: 1101
+...
+
+
+```python
+print_codes(node.left, code + "0")
+print_codes(node.right, code + "1")
+We go left and right recursively.
+
+- Left path → add `"0"`
+- Right path → add `"1"`
+
+So codes are formed by the path from root to leaf.
+
+---
+
+## 🏁 Main Program
+
+```python
+if __name__ == "__main__":
+
+This means: run the below code only when this file is directly executed.
+
+```python
+chars = ['a','b','c','d','e','f']
+freqs = [5,9,12,13,16,45]
+Our input data (characters and their frequencies).
+
+---
+
+### ```python
+root = huffman_encoding(chars, freqs)
+
+This builds the Huffman Tree and returns the root node.
+
+```python
+print("characters:", chars)
+print("frequencies:", freqs)
+print("Huffman Codes:")
+print_codes(root)
+Finally, it prints each character with its Huffman code.
+
+---
+
+## 📊 Dry Run (short version)
+
+| Step | Action | Heap State (frequencies) |
+|------|---------|--------------------------|
+| 1 | Take 5,9 → merge = 14 | [12,13,14,16,45] |
+| 2 | Take 12,13 → merge = 25 | [14,16,25,45] |
+| 3 | Take 14,16 → merge = 30 | [25,30,45] |
+| 4 | Take 25,30 → merge = 55 | [45,55] |
+| 5 | Take 45,55 → merge = 100 | [100] |
+
+✅ Final root = 100  
+✅ Tree built successfully  
+✅ Then we traverse to print Huffman codes.
+
+---
+
+## 🧾 Example Output:
+
+characters: ['a', 'b', 'c', 'd', 'e', 'f']
+frequencies: [5, 9, 12, 13, 16, 45]
+Huffman Codes:
+f: 0
+c: 100
+d: 101
+a: 1100
+b: 1101
+e: 111
+
+---
+
+Would you like me to draw the **final Huffman tree (in text format)** showing left(0)/right(1) clearly? It will help you visualize where each code comes from.
+
+
+
+
+🧠 Problem: What Are We Doing?
+
+We have some characters (like 'a', 'b', 'c', etc.)
+Each has a frequency (how many times it appears).
+We want to build a Huffman Tree that gives short binary codes (0/1) for frequent letters and longer ones for less frequent letters.
+👉 This helps compress data.
+
+🔹 FULL CODE EXPLAINED — LINE BY LINE
+```python
+
+import heapq
+
+- `import` → tells Python to bring an **external library**.  
+- `heapq` → is a built-in Python module that lets us use a **min-heap (priority queue)**.  
+  - A heap is a data structure where the **smallest element** is always at the top.  
+  - We’ll use this to easily pick the **two smallest frequency nodes** each time.
+
+---
+
+### ```python
+class Node:
+
+
+class → is used to create your own data type (a blueprint for objects).
+
+Node → is the name of the class.
+This class will represent one node of the Huffman tree (it can hold a character and its frequency).
+
+```python
+def __init__(self, char, freq):
+
+- `def` → defines a function.  
+- `__init__` → is a **special method** that runs **automatically** whenever you create a new `Node`.  
+- `self` → refers to the **current object** being created.  
+- `char` → a parameter to store the **character** (like `'a'`).  
+- `freq` → a parameter to store the **frequency** (like `5`).
+
+So when you write:
+```python
+Node('a', 5)
+
+
+It means:
+
+Create a node that represents the letter 'a' with frequency 5.
+
+```python
+    self.char = char
+
+- `self.char` → is a **variable inside the object**.  
+- `=` → assigns value.  
+- `char` → the input parameter.  
+So this line means:
+> Store the character value inside the node.
+
+---
+
+### ```python
+        self.freq = freq
+
+
+Same idea:
+
+Store the frequency value inside the node.
+
+So now the node knows:
+character = 'a', frequency = 5
+
+```python
+    self.left = self.right = None
+
+We’re creating two **links (pointers)** for the tree:
+- `left` → will store the left child node.
+- `right` → will store the right child node.
+- `None` → means currently there’s no child (it’s empty).
+
+Later we will connect them when merging nodes.
+
+---
+
+### ```python
+    def __lt__(self, other): return self.freq < other.freq
+
+
+This is a special comparison function used when the heap (heapq) compares two Nodes.
+
+__lt__ means “less than” (<).
+
+self → current node being compared.
+
+other → another node.
+
+self.freq < other.freq → compares based on their frequencies.
+
+So this line tells Python:
+
+When comparing two Node objects, compare their frequencies.
+
+Example:
+
+Node('a', 5) < Node('b', 9)  # True because 5 < 9
+
+⚙️ Function 1 — Building the Huffman Tree
+```python
+
+def huffman_encoding(chars, freqs):
+
+We’re defining a new function called `huffman_encoding`  
+It takes two lists:
+- `chars` → list of characters like `['a','b','c','d','e','f']`
+- `freqs` → list of frequencies like `[5,9,12,13,16,45]`
+
+---
+
+### ```python
+    heap = [Node(c, f) for c, f in zip(chars, freqs)]
+
+
+Let’s break it down:
+
+zip(chars, freqs) → pairs characters with their frequencies:
+
+[('a',5), ('b',9), ('c',12), ('d',13), ('e',16), ('f',45)]
+
+
+for c, f in zip(chars, freqs) → loops through each (character, frequency) pair.
+
+Node(c, f) → creates a Node object for each pair.
+
+[ ... ] → creates a list.
+
+So heap will now contain:
+
+[Node('a',5), Node('b',9), Node('c',12), Node('d',13), Node('e',16), Node('f',45)]
+
+```python
+heapq.heapify(heap)
+
+This converts the list into a **min-heap** automatically.
+
+Now the smallest frequency node (5) will be at the top.  
+Heap helps us always pick the **two smallest** nodes efficiently.
+
+---
+
+### ```python
+    while len(heap) > 1:
+
+
+While there’s more than one node in the heap,
+→ We’ll keep merging nodes until only one (the root) remains.
+
+```python
+    left, right = heapq.heappop(heap), heapq.heappop(heap)
+
+- `heapq.heappop(heap)` → removes and returns the **smallest node** from the heap.  
+- We pop **two smallest** nodes at a time — they will become children of a new parent node.
+
+Example (first step):
+
+
+Pop (a,5) and (b,9)
+
+
+---
+
+### ```python
+        merged = Node(None, left.freq + right.freq)
+
+
+We create a new merged node:
+
+char=None → because this new node doesn’t represent a single character.
+
+freq = left.freq + right.freq → total frequency of both children.
+
+Example:
+
+5 + 9 = 14
+So merged node = (None, 14)
+
+```python
+    merged.left, merged.right = left, right
+
+We attach the two smallest nodes as children:
+- `left` → left child
+- `right` → right child
+
+So the structure becomes:
+
+   (14)
+  /    \
+
+
+(5) (9)
+
+
+---
+
+### ```python
+        heapq.heappush(heap, merged)
+
+
+We push the merged node back into the heap.
+Now the heap again sorts automatically by frequency.
+
+```python
+return heap[0]
+
+When the loop ends, only **one node** is left → the root of the Huffman Tree.  
+We return it.
+
+---
+
+## ⚙️ Function 2 — Printing the Codes
+
+### ```python
+def print_codes(node, code=""):
+
+
+This function prints Huffman codes for all characters.
+
+node → current node (starting from root)
+
+code → the binary code built so far (starts empty)
+
+```python
+if node is None: return
+
+If there’s no node (empty), just stop — base case for recursion.
+
+---
+
+### ```python
+    if node.char: print(f"{node.char}: {code}")
+
+
+If the node has a character (i.e., it’s a leaf node),
+print the character and its code.
+
+Example:
+
+a: 1100
+b: 1101
+
+```python
+print_codes(node.left, code + "0")
+print_codes(node.right, code + "1")
+
+Recursive calls:
+- Go **left** → add `"0"` to the code.
+- Go **right** → add `"1"` to the code.
+
+So as we go down the tree, the code builds up.
+
+---
+
+## 🏁 MAIN PROGRAM
+
+### ```python
+if __name__ == "__main__":
+
+
+This line ensures the below code runs only when you directly execute this file, not when it’s imported elsewhere.
+
+```python
+chars = ['a','b','c','d','e','f']
+
+List of **characters**.
+
+---
+
+### ```python
+    freqs = [5,9,12,13,16,45]
+
+
+List of their frequencies.
+
+```python
+root = huffman_encoding(chars, freqs)
+
+This calls the function we made → builds the Huffman tree → returns the **root node**.
+
+---
+
+### ```python
+    print("characters:", chars)
+    print("frequencies:", freqs)
+
+
+Just displays the input lists for clarity.
+
+```python
+print("Huffman Codes:")
+
+Prints a heading before showing the codes.
+
+---
+
+### ```python
+    print_codes(root)
+
+
+Calls our recursive function to print each character and its Huffman binary code.
+
+✅ Example Output
+characters: ['a', 'b', 'c', 'd', 'e', 'f']
+frequencies: [5, 9, 12, 13, 16, 45]
+Huffman Codes:
+f: 0
+c: 100
+d: 101
+a: 1100
+b: 1101
+e: 111
